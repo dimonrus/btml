@@ -6,6 +6,13 @@ import (
 	"text/template"
 )
 
+const (
+	// TemplateNameKey name of template
+	TemplateNameKey = "_n_"
+	// TemplateTextKey text of template
+	TemplateTextKey = "_t_"
+)
+
 // ITemplate bytes template interface based on json representation
 type ITemplate interface {
 	// GetName return template name
@@ -32,7 +39,7 @@ type Template struct {
 
 // GetName return template name
 func (t *Template) GetName() string {
-	name, ok := t.params["_n_"]
+	name, ok := t.params[TemplateNameKey]
 	if ok {
 		return name.(string)
 	}
@@ -41,7 +48,7 @@ func (t *Template) GetName() string {
 
 // GetText return template text
 func (t *Template) GetText() string {
-	text, ok := t.params["_t_"]
+	text, ok := t.params[TemplateTextKey]
 	if ok {
 		return text.(string)
 	}
@@ -77,8 +84,8 @@ func (t *Template) SetParam(name string, param any) ITemplate {
 func (t *Template) Render() ([]byte, error) {
 	for k, v := range t.params {
 		if m, ok := v.(map[string]any); ok {
-			name, okName := m["_n_"]
-			_, okText := m["_t_"]
+			name, okName := m[TemplateNameKey]
+			_, okText := m[TemplateTextKey]
 			if okName && okText {
 				tmpl := NewTemplate().SetParams(m)
 				data, err := tmpl.Render()
@@ -117,10 +124,10 @@ func (t *Template) MarshalJSON() ([]byte, error) {
 func NewTemplate(arg ...string) *Template {
 	t := &Template{}
 	if len(arg) == 1 {
-		t.SetParam("_n_", arg[0])
+		t.SetParam(TemplateNameKey, arg[0])
 	} else if len(arg) == 2 {
-		t.SetParam("_n_", arg[0])
-		t.SetParam("_t_", arg[1])
+		t.SetParam(TemplateNameKey, arg[0])
+		t.SetParam(TemplateTextKey, arg[1])
 	}
 	return t
 }
