@@ -27,14 +27,17 @@ func (p Parameters) IsTemplate(name string) (t ITemplate, ok bool) {
 }
 
 // EnrichText set text for each template in params
-func (p Parameters) EnrichText(te TextEnricher) Parameters {
+func (p Parameters) EnrichText(te TextEnricher, override bool) Parameters {
 	for k, v := range p {
 		if k == TemplateNameKey {
-			p[TemplateTextKey] = te.GetText(p[TemplateNameKey].(string))
+			text := te.GetText(p[TemplateNameKey].(string))
+			if override || p[TemplateTextKey] == "" {
+				p[TemplateTextKey] = text
+			}
 			continue
 		}
 		if m, okP := v.(map[string]interface{}); okP {
-			p[k] = Parameters(m).EnrichText(te)
+			p[k] = Parameters(m).EnrichText(te, override)
 		}
 	}
 	return p
