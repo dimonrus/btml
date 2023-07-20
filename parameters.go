@@ -8,18 +8,20 @@ type TextEnricher interface {
 	GetText(name string) string
 }
 
-// IsTemplate check if template
-func (p Parameters) IsTemplate(name string) (t ITemplate, ok bool) {
+// CheckTemplateParams check if params template
+func (p Parameters) CheckTemplateParams(name string) (params Parameters, ok bool) {
 	if v, k := p[name]; k {
-		if t, ok = v.(ITemplate); ok {
+		if _, ok = v.(ITemplate); ok {
 			return
-		} else if m, okP := v.(Parameters); okP {
-			if n, okN := m[TemplateNameKey]; okN {
-				if s, okS := n.(string); okS {
-					if Constructor != nil {
-						t = Constructor(s)
-					}
-				}
+		} else if ps, okPS := v.(Parameters); okPS {
+			if _, okN := ps[TemplateNameKey]; okN {
+				params = ps
+				ok = true
+			}
+		} else if m, okP := v.(map[string]any); okP {
+			if _, okN := m[TemplateNameKey]; okN {
+				params = m
+				ok = true
 			}
 		}
 	}

@@ -46,5 +46,13 @@ func TestParameters_EnrichText(t *testing.T) {
 		if params["body"].(Parameters)[TemplateTextKey] != "Love is gonna save us" {
 			t.Fatal("wrong enricher for body")
 		}
+		tml.SetParams(params)
+		data, err := tml.Render()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(data) != "You need this. Love is gonna save us. Leave it to us." {
+			t.Fatal("wrong render")
+		}
 	})
 }

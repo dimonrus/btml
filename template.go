@@ -82,12 +82,12 @@ func (t *Template) SetParam(name string, param any) ITemplate {
 
 // Render render template
 func (t *Template) Render() ([]byte, error) {
-	for k, v := range t.params {
-		if m, ok := v.(map[string]any); ok {
-			name, okName := m[TemplateNameKey]
-			_, okText := m[TemplateTextKey]
+	for k := range t.params {
+		if params, ok := t.params.CheckTemplateParams(k); ok {
+			name, okName := params[TemplateNameKey]
+			_, okText := params[TemplateTextKey]
 			if okName && okText {
-				tmpl := NewTemplate().SetParams(m)
+				tmpl := NewTemplate().SetParams(params)
 				data, err := tmpl.Render()
 				if err != nil {
 					return nil, err
